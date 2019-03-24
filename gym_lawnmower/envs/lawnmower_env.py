@@ -54,13 +54,15 @@ grid_to_character = {
     GRID_INDEX_MOWER_LEFT: "<",
 }
 
-TILE_SIZE = 32
+TILE_SIZE = 64
 
 def load_image(filename):
     root_path = os.path.abspath(os.path.dirname(__file__))
     image_path = os.path.join(root_path, "resources", filename)
     print(image_path)
-    return pygame.image.load(image_path)
+    image = pygame.image.load(image_path)
+    image = pygame.transform.scale(image, [TILE_SIZE, TILE_SIZE])
+    return image
 
 # Mapping grid to image.
 grid_to_image = {
@@ -142,11 +144,10 @@ class LawnmowerEnv(gym.Env):
                 new_x -= 1
 
             # See if the move is possible.
-            if new_x in range(0, self.width) and new_y in range(0, self.height):
-                if self.grid[new_x, new_y] in [GRID_INDEX_GRASS, GRID_INDEX_MOWED]:
-                    self.grid[old_x, old_y] = GRID_INDEX_MOWED
-                    self.grid[new_x, new_y] = orientation_to_grid[self.mower_orientation]
-                    self.mower_position = (new_x, new_y)
+            if self.grid[new_x, new_y] in [GRID_INDEX_GRASS, GRID_INDEX_MOWED]:
+                self.grid[old_x, old_y] = GRID_INDEX_MOWED
+                self.grid[new_x, new_y] = orientation_to_grid[self.mower_orientation]
+                self.mower_position = (new_x, new_y)
 
             # Hitting and obstacle.
             else:
