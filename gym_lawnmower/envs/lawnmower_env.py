@@ -6,6 +6,7 @@ import pygame
 import numpy as np
 import random
 
+# TODO consider fog of war
 
 # Indices for grid.
 GRID_INDEX_GRASS = 0
@@ -73,10 +74,10 @@ grid_to_image = {
 }
 
 # Rewards.
-REWARD_EXCEEDED = -1
+REWARD_EXCEEDED = -100
 REWARD_STEP = -1
 REWARD_ALL_MOWED = 100
-
+REWARD_OBSTACLE_COLLISION = -100
 
 class LawnmowerEnv(gym.Env):
 
@@ -114,28 +115,13 @@ class LawnmowerEnv(gym.Env):
 
         self.current_step += 1
 
-        observation = self._get_observation()
-
         if self.current_step == self.max_steps:
+            observation = self._get_observation()
             reward = REWARD_EXCEEDED
             done = True
 
         else :
-
-            self._perform_action(action)
-
-            # Count grass.
-            zero_count = self.width * self.height - np.count_nonzero(self.grid)
-            all_mowed = zero_count == 0
-
-            if all_mowed == True:
-                reward = REWARD_ALL_MOWED
-                done = True
-                print("ALL MOWED")
-            else:
-                reward = REWARD_STEP
-                done = False
-
+            reward, done = self._perform_action(action)
             observation = self._get_observation()
 
         info = {}
@@ -155,20 +141,43 @@ class LawnmowerEnv(gym.Env):
             elif self.mower_orientation == ORIENTATION_INDEX_LEFT:
                 new_x -= 1
 
+            # See if the move is possible.
             if new_x in range(0, self.width) and new_y in range(0, self.height):
                 if self.grid[new_x, new_y] in [GRID_INDEX_GRASS, GRID_INDEX_MOWED]:
                     self.grid[old_x, old_y] = GRID_INDEX_MOWED
                     self.grid[new_x, new_y] = orientation_to_grid[self.mower_orientation]
                     self.mower_position = (new_x, new_y)
+
+            # Hitting and obstacle.
+            else:
+                reward = REWARD_OBSTACLE_COLLISION
+                done = True
+                return reward, done
+
         elif action == ACTION_INDEX_LEFT:
             self.mower_orientation = (self.mower_orientation - 1) % 4
             self.grid[self.mower_position] = orientation_to_grid[self.mower_orientation]
+
         elif action == ACTION_INDEX_RIGHT:
             self.mower_orientation = (self.mower_orientation + 1) % 4
             self.grid[self.mower_position] = orientation_to_grid[self.mower_orientation]
 
         else:
             assert False, str(self.mower_orientation)
+
+        # Count grass.
+        zero_count = self.width * self.height - np.count_nonzero(self.grid)
+        all_mowed = zero_count == 0
+
+        if all_mowed == True:
+            reward = REWARD_ALL_MOWED
+            done = True
+            print("ALL MOWED")
+        else:
+            reward = REWARD_STEP
+            done = False
+
+        return reward, done
 
 
     def reset(self):
@@ -185,6 +194,14 @@ class LawnmowerEnv(gym.Env):
         self.mower_position = (x, y)
         self.mower_orientation = random.randint(0, ORIENTATION_INDEX_MAX)
         self.grid[x, y] = orientation_to_grid[self.mower_orientation]
+
+        # Add border.
+        for x in [0, self.width - 1]:
+            for y in range(0, self.height):
+                self.grid[x, y] = GRID_INDEX_OBSTACLE
+        for y in [0, self.height - 1]:
+            for x in range(0, self.width):
+                self.grid[x, y] = GRID_INDEX_OBSTACLE
 
         # Add obstacles.
         counter = 0
@@ -216,6 +233,7 @@ class LawnmowerEnv(gym.Env):
         # Lazy loading pygame.
         if self._pygame_screen == None:
             pygame.init()
+            pygame.display.set_caption(self.unwrapped.spec.id)
             self.screen_width = self.width * TILE_SIZE
             self.screen_height = self.height * TILE_SIZE
             self._pygame_screen = pygame.display.set_mode((self.screen_width, self.screen_height))
@@ -230,14 +248,13 @@ class LawnmowerEnv(gym.Env):
                 screen_x = x * TILE_SIZE
                 screen_y = y * TILE_SIZE
                 self._pygame_screen.blit(grid_to_image[cell], (screen_x, screen_y))
-                pass
 
         # Flip
         pygame.display.flip()
 
     def _random_position(self):
-        x = random.randint(0, self.width - 1)
-        y = random.randint(0, self.height- 1)
+        x = random.randint(1, self.width - 2)
+        y = random.randint(1, self.height- 2)
         return x, y
 
     def _get_observation(self):

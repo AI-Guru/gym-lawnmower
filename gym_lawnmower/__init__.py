@@ -1,8 +1,8 @@
 from gym.envs.registration import register
 
 kwargs = {
-    "width": 4,
-    "height": 4,
+    "width": 5,
+    "height": 5,
     "obstacle_number": 0,
     "max_steps": 50,
 }
@@ -13,8 +13,8 @@ register(
 )
 
 kwargs = {
-    "width": 4,
-    "height": 4,
+    "width": 5,
+    "height": 5,
     "obstacle_number": 2,
     "max_steps": 50,
 }
@@ -25,8 +25,8 @@ register(
 )
 
 kwargs = {
-    "width": 8,
-    "height": 8,
+    "width": 9,
+    "height": 9,
     "obstacle_number": 0,
     "max_steps": 150,
 }
@@ -37,8 +37,8 @@ register(
 )
 
 kwargs = {
-    "width": 8,
-    "height": 8,
+    "width": 9,
+    "height": 9,
     "obstacle_number": 4,
     "max_steps": 150,
 }
@@ -49,8 +49,8 @@ register(
 )
 
 kwargs = {
-    "width": 16,
-    "height": 16,
+    "width": 17,
+    "height": 17,
     "obstacle_number": 0,
     "max_steps": 750,
 }
@@ -61,8 +61,8 @@ register(
 )
 
 kwargs = {
-    "width": 16,
-    "height": 16,
+    "width": 17,
+    "height": 17,
     "obstacle_number": 8,
     "max_steps": 750,
 }
