@@ -121,12 +121,10 @@ class LawnmowerEnv(gym.Env):
             observation = self._get_observation()
             reward = REWARD_EXCEEDED
             done = True
-
+            info = { "done_reason" : "Steps exceeded." }
         else :
-            reward, done = self._perform_action(action)
+            reward, done, info = self._perform_action(action)
             observation = self._get_observation()
-
-        info = {}
 
         return observation, reward, done, info
 
@@ -153,7 +151,8 @@ class LawnmowerEnv(gym.Env):
             else:
                 reward = REWARD_OBSTACLE_COLLISION
                 done = True
-                return reward, done
+                info = { "done_reason" : "Collision with obstacle." }
+                return reward, done, info
 
         elif action == ACTION_INDEX_LEFT:
             self.mower_orientation = (self.mower_orientation - 1) % 4
@@ -173,12 +172,13 @@ class LawnmowerEnv(gym.Env):
         if all_mowed == True:
             reward = REWARD_ALL_MOWED
             done = True
-            print("ALL MOWED")
+            info = { "done_reason" : "All mowed." }
         else:
             reward = REWARD_STEP
             done = False
+            info = {}
 
-        return reward, done
+        return reward, done, info
 
 
     def reset(self):
