@@ -3,6 +3,7 @@ import gym
 import gym_lawnmower
 import random
 
+# Allow for multiple environments and create a random one.
 environment_ids = [
     "lawnmower-small-v0",
     "lawnmower-small-obstacles-v0",
@@ -15,6 +16,7 @@ environment_id = random.choice(environment_ids)
 environment = gym.make(environment_id)
 environment.print_description()
 
+# Run a random agent on the instantiated environment.
 observation = environment.reset()
 done = False
 while done == False:
@@ -23,4 +25,3 @@ while done == False:
     environment.render()
     print("Reward", reward, "Action", action, "Done", done)
     time.sleep(0.5)
-print(info)

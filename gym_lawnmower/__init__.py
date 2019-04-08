@@ -1,5 +1,6 @@
 from gym.envs.registration import register
 
+# A very small map. No obstacles.
 kwargs = {
     "width": 5,
     "height": 5,
@@ -12,6 +13,7 @@ register(
     kwargs=kwargs
 )
 
+# A very small map. Some random obstacles.
 kwargs = {
     "width": 5,
     "height": 5,
@@ -24,6 +26,7 @@ register(
     kwargs=kwargs
 )
 
+# A medium sized map. No obstacles.
 kwargs = {
     "width": 9,
     "height": 9,
@@ -36,6 +39,7 @@ register(
     kwargs=kwargs
 )
 
+# A medium sized map. Some random obstacles.
 kwargs = {
     "width": 9,
     "height": 9,
@@ -48,6 +52,7 @@ register(
     kwargs=kwargs
 )
 
+# A very big map. No obstacles.
 kwargs = {
     "width": 17,
     "height": 17,
@@ -60,6 +65,7 @@ register(
     kwargs=kwargs
 )
 
+# A very big map. Some random obstacles.
 kwargs = {
     "width": 17,
     "height": 17,
